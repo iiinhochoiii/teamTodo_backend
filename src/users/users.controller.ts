@@ -14,6 +14,11 @@ import { User } from './user.entity';
 export class UsersController {
   constructor(private service: UsersService) {}
 
+  @Get()
+  findAll() {
+    return this.service.findAll();
+  }
+
   @Get(':id')
   get(@Param() params) {
     return this.service.getUser(params.id);
@@ -32,5 +37,10 @@ export class UsersController {
   @Delete(':id')
   deleteUser(@Param() params) {
     return this.service.deleteUser(params.id);
+  }
+
+  @Get('/emailDuplicate/:email')
+  emailDuplicate(@Param('email') _email: string) {
+    return this.service.emailDuplicate(_email);
   }
 }

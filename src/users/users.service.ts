@@ -9,22 +9,33 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find();
+  }
+
   async createUser(user: User) {
     this.usersRepository.save(user);
   }
 
   async getUser(_id: number) {
-    return this.usersRepository.find({
-      select: ['id', 'email', 'name', 'phone', 'profile'],
-      where: [{ id: _id }],
-    });
+    return `get User :${_id}`;
+    // return this.usersRepository.find({
+    //   select: ['id', 'email', 'name', 'phone', 'profile'],
+    //   where: [{ id: _id }],
+    // });
   }
 
   async updateUser(user: User) {
-    this.usersRepository.save(user);
+    return `update User :${user}`;
+    // this.usersRepository.save(user);
   }
 
   async deleteUser(user: User) {
-    this.usersRepository.delete(user);
+    return `delete User :${user}`;
+    // this.usersRepository.delete(user);
+  }
+
+  async emailDuplicate(_email: string) {
+    return `email duplicate : ${_email}`;
   }
 }
