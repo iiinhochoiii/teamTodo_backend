@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { RandomText } from '../utils/random';
 
 @Injectable()
 export class UsersService {
@@ -35,7 +36,19 @@ export class UsersService {
     // this.usersRepository.delete(user);
   }
 
-  async emailDuplicate(_email: string) {
-    return `email duplicate : ${_email}`;
+  async verification(
+    _email: string,
+  ): Promise<{ result: boolean; message: string; random?: string }> {
+    const user = await this.usersRepository.findOneBy({ email: _email });
+
+    return {
+      result: !!user,
+      message: user
+        ? '회원가입 인증번호가 전송되었습니다.'
+        : '이미 가입된 계정 입니다.',
+      ...(user && {
+        random: RandomText(),
+      }),
+    };
   }
 }

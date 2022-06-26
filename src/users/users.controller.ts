@@ -39,8 +39,8 @@ export class UsersController {
     return this.service.deleteUser(params.id);
   }
 
-  @Get('/emailDuplicate/:email')
-  emailDuplicate(@Param('email') _email: string) {
-    return this.service.emailDuplicate(_email);
+  @Get('/verification/:email')
+  verification(@Param('email') _email: string) {
+    return this.service.verification(_email);
   }
 }
