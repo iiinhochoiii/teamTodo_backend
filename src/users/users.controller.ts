@@ -38,9 +38,4 @@ export class UsersController {
   deleteUser(@Param() params) {
     return this.service.deleteUser(params.id);
   }
-
-  @Get('/verification/:email')
-  verification(@Param('email') _email: string) {
-    return this.service.verification(_email);
-  }
 }
