@@ -9,14 +9,10 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { EmailService } from '../email/email.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private service: UsersService,
-    private emailService: EmailService,
-  ) {}
+  constructor(private service: UsersService) {}
 
   @Get()
   findAll() {
@@ -41,10 +37,5 @@ export class UsersController {
   @Delete(':id')
   deleteUser(@Param() params) {
     return this.service.deleteUser(params.id);
-  }
-
-  @Get('/verification/:email')
-  verification(@Param('email') _email: string) {
-    return this.emailService.verification(_email);
   }
 }
