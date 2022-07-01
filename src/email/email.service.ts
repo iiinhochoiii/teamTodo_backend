@@ -29,9 +29,9 @@ export class EmailService {
       try {
         await this.mailerService.sendMail({
           to: _email,
-          subject: '테스트',
-          from: 'test@teamtodo.com',
-          html: `테스트 ${randomText}`,
+          subject: 'TeamTodo 회원가입 인증번호 입니다.',
+          template: 'verification',
+          context: { randomText: randomText },
         });
         return {
           result: true,
