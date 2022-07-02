@@ -9,4 +9,9 @@ export class EmailController {
   verification(@Param('email') _email: string) {
     return this.service.verification(_email);
   }
+
+  @Get('/')
+  findAll() {
+    return this.service.findAll();
+  }
 }

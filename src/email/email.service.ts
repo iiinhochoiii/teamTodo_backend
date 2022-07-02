@@ -4,12 +4,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RandomText } from '../utils/random';
 import { User } from '../users/user.entity';
+import { Email } from './email.entity';
 
 @Injectable()
 export class EmailService {
   constructor(
     private readonly mailerService: MailerService,
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Email) private emailsRepository: Repository<Email>,
   ) {}
 
   async verification(_email: string): Promise<{
@@ -27,12 +29,19 @@ export class EmailService {
     } else {
       const randomText = RandomText();
       try {
+        await this.emailsRepository.save({
+          email: _email,
+          certificationNumber: randomText,
+          createdAt: new Date(),
+        });
+
         await this.mailerService.sendMail({
           to: _email,
           subject: 'TeamTodo 회원가입 인증번호 입니다.',
           template: 'verification',
           context: { randomText: randomText },
         });
+
         return {
           result: true,
           message: '회원가입 인증번호가 전송되었습니다.',
@@ -45,5 +54,9 @@ export class EmailService {
         };
       }
     }
+  }
+
+  async findAll(): Promise<Email[]> {
+    return this.emailsRepository.find();
   }
 }
