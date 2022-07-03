@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { RandomText } from '../utils/random';
 import { User } from '../users/user.entity';
 import { Email } from './email.entity';
+import { CertifyDto } from './dto/certify.dto';
 
 @Injectable()
 export class EmailService {
@@ -54,6 +55,10 @@ export class EmailService {
         };
       }
     }
+  }
+
+  async certify(data: CertifyDto) {
+    return data;
   }
 
   async findAll(): Promise<Email[]> {
