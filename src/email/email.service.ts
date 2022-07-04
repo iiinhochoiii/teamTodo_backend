@@ -57,8 +57,33 @@ export class EmailService {
     }
   }
 
-  async certify(data: CertifyDto) {
-    return data;
+  async certify(data: CertifyDto): Promise<any> {
+    if (!data.email || !data.certificationNumber) {
+      return {
+        result: false,
+        message: '올바른 데이터가 전달되지 않았습니다.',
+      };
+    }
+
+    const email = await this.emailsRepository.findOne({
+      where: {
+        email: data.email,
+        certificationNumber: data.certificationNumber,
+      },
+    });
+
+    if (email) {
+      await this.emailsRepository.delete({ id: email.id });
+      return {
+        result: true,
+        message: '인증되었습니다.',
+      };
+    } else {
+      return {
+        result: false,
+        message: '인증번호가 맞지 않습니다.',
+      };
+    }
   }
 
   async findAll(): Promise<Email[]> {
