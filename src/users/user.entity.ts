@@ -19,4 +19,9 @@ export class User {
 
   @Column({ nullable: true })
   profile: string | null;
+
+  @Column({
+    nullable: true,
+  })
+  createdAt: Date | null;
 }
