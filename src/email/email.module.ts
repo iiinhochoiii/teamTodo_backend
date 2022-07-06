@@ -19,7 +19,7 @@ import * as path from 'path';
         transport: {
           service: 'gmail',
           port: 587,
-          host: configService.get('configService'),
+          host: configService.get('EMAIL_HOST'),
           secure: true,
           auth: {
             user: configService.get('EMAIL_AUTH_USER'),
