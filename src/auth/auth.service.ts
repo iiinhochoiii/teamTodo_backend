@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../users/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -37,6 +38,22 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('인증되지 않은 사용자입니다.');
     }
-    return data;
+
+    const isUserPassword = await bcrypt.compare(password, user.password);
+
+    if (!isUserPassword) {
+      throw new UnauthorizedException('패스워드가 틀립니다.');
+    }
+
+    const token = this.jwtService.sign({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    });
+
+    return {
+      status: true,
+      token,
+    };
   }
 }
