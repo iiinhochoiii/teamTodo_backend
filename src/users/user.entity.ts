@@ -24,4 +24,9 @@ export class User {
     nullable: true,
   })
   createdAt: Date | null;
+
+  @Column({
+    nullable: true,
+  })
+  lastLoginedAt: Date | null;
 }
