@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
@@ -12,13 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: string) {
-    const user = payload;
-
-    if (user) {
-      return user;
-    } else {
-      throw new UnauthorizedException('접근 오류');
-    }
+  async validate(payload: any) {
+    return { id: payload.id, email: payload.email, name: payload.name };
   }
 }
