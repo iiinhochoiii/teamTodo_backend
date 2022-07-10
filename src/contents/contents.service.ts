@@ -1,8 +1,14 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateContentDto } from './dto/createContent.dto';
+import { UpdateContentDto } from './dto/updateContent.dto';
 import { Content } from './content.entity';
+import { ResultType } from '../interfaces/common';
 
 @Injectable()
 export class ContentsService {
@@ -10,10 +16,7 @@ export class ContentsService {
     @InjectRepository(Content) private repository: Repository<Content>,
   ) {}
 
-  async create(content: CreateContentDto): Promise<{
-    result: boolean;
-    message: string;
-  }> {
+  async create(content: CreateContentDto): Promise<ResultType> {
     const { creatorUserId, happend, plan } = content;
 
     if (!content.creatorUserId) {
@@ -30,6 +33,33 @@ export class ContentsService {
     return {
       result: true,
       message: '컨텐츠가 등록 되었습니다.',
+    };
+  }
+
+  async update(body: UpdateContentDto): Promise<ResultType | any> {
+    const { id, happend, plan } = body;
+
+    if (!id) {
+      throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
+    }
+
+    const content = await this.repository.findOneBy({ id });
+
+    if (!content) {
+      throw new NotFoundException(
+        '서버로 부터 변경하는 데이터를 찾을 수 없습니다.',
+      );
+    }
+
+    await this.repository.update(content.id, {
+      happend: happend,
+      plan: plan,
+      updatedAt: new Date(),
+    });
+
+    return {
+      result: true,
+      message: '콘텐츠가 변경되었습니다.',
     };
   }
 

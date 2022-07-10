@@ -1,6 +1,7 @@
-import { Controller, UseGuards, Post, Get, Body } from '@nestjs/common';
+import { Controller, UseGuards, Post, Get, Body, Put } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { CreateContentDto } from './dto/createContent.dto';
+import { UpdateContentDto } from './dto/updateContent.dto';
 import { ContentsService } from './contents.service';
 
 @Controller('contents')
@@ -17,5 +18,11 @@ export class ContentsController {
   @Post()
   create(@Body() content: CreateContentDto) {
     return this.service.create(content);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put()
+  update(@Body() content: UpdateContentDto) {
+    return this.service.update(content);
   }
 }
