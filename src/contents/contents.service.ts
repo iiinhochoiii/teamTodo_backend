@@ -36,7 +36,7 @@ export class ContentsService {
     };
   }
 
-  async update(body: UpdateContentDto): Promise<ResultType | any> {
+  async update(body: UpdateContentDto): Promise<ResultType> {
     const { id, happend, plan } = body;
 
     if (!id) {
@@ -65,5 +65,24 @@ export class ContentsService {
 
   async findAll() {
     return this.repository.find();
+  }
+
+  async delete(id: number): Promise<ResultType | any> {
+    if (!id) {
+      throw new BadRequestException('id가 전달되지 않았습니다.');
+    }
+
+    const content = await this.repository.findOneBy({ id });
+
+    if (!content) {
+      throw new NotFoundException('삭제할 데이터를 찾을 수 없습니다.');
+    }
+
+    await this.repository.delete(content.id);
+
+    return {
+      result: true,
+      message: '콘텐츠가 삭제되었습니다.',
+    };
   }
 }

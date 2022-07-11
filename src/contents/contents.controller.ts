@@ -1,4 +1,13 @@
-import { Controller, UseGuards, Post, Get, Body, Put } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Post,
+  Get,
+  Body,
+  Put,
+  Delete,
+  Param,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { CreateContentDto } from './dto/createContent.dto';
 import { UpdateContentDto } from './dto/updateContent.dto';
@@ -24,5 +33,11 @@ export class ContentsController {
   @Put()
   update(@Body() content: UpdateContentDto) {
     return this.service.update(content);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  delete(@Param() param) {
+    return this.service.delete(param.id);
   }
 }
