@@ -63,8 +63,12 @@ export class ContentsService {
     };
   }
 
-  async findAll() {
-    return this.repository.find();
+  async findAll(id: number) {
+    return this.repository.find({
+      where: {
+        creatorUserId: id,
+      },
+    });
   }
 
   async delete(id: number): Promise<ResultType | any> {

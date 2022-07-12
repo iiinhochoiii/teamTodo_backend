@@ -7,7 +7,9 @@ import {
   Put,
   Delete,
   Param,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { CreateContentDto } from './dto/createContent.dto';
 import { UpdateContentDto } from './dto/updateContent.dto';
@@ -19,8 +21,10 @@ export class ContentsController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  find() {
-    return this.service.findAll();
+  find(@Req() req: Request) {
+    const { user }: any = req;
+
+    return this.service.findAll(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
