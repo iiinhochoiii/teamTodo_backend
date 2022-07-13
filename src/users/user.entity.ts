@@ -28,5 +28,10 @@ export class User {
   @Column({
     nullable: true,
   })
+  updatedAt: Date | null;
+
+  @Column({
+    nullable: true,
+  })
   lastLoginedAt: Date | null;
 }
