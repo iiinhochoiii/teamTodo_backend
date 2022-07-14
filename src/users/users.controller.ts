@@ -18,6 +18,13 @@ export class UsersController {
   constructor(private service: UsersService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get('my')
+  findMy(@Req() req: Request) {
+    const { user }: any = req;
+    return this.service.findMy(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.service.findAll();

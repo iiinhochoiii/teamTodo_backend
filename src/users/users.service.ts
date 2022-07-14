@@ -16,19 +16,60 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
+  async findMy(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      select: [
+        'id',
+        'email',
+        'email',
+        'name',
+        'phone',
+        'profile',
+        'createdAt',
+        'updatedAt',
+        'lastLoginedAt',
+      ],
+      where: [{ id }],
+    });
+
+    if (!user) {
+      throw new NotFoundException('서버로 부터 유저 정보를 찾을 수 없습니다.');
+    }
+
+    return user;
+  }
+
   async findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
 
-  async getUser(_id: number) {
-    return `get User :${_id}`;
-    // return this.usersRepository.find({
-    //   select: ['id', 'email', 'name', 'phone', 'profile'],
-    //   where: [{ id: _id }],
-    // });
+  async getUser(id: number): Promise<User> {
+    if (!id) {
+      throw new BadRequestException('올바르지 않은 데이터를 요청하였습니다.');
+    }
+
+    const user = await this.usersRepository.findOne({
+      select: [
+        'id',
+        'email',
+        'name',
+        'phone',
+        'profile',
+        'createdAt',
+        'updatedAt',
+        'lastLoginedAt',
+      ],
+      where: [{ id }],
+    });
+
+    if (!user) {
+      throw new NotFoundException('서버로 부터 유저 정보를 찾을 수 없습니다.');
+    }
+
+    return user;
   }
 
-  async updateUser(id: number, body: UpdateUserDto): Promise<ResultType | any> {
+  async updateUser(id: number, body: UpdateUserDto): Promise<ResultType> {
     const user = await this.usersRepository.findOneBy({ id });
 
     if (!body.name && !body.password && !body.phone) {
@@ -60,8 +101,22 @@ export class UsersService {
     };
   }
 
-  async deleteUser(user: User) {
-    return `delete User :${user}`;
-    // this.usersRepository.delete(user);
+  async deleteUser(id: number): Promise<ResultType> {
+    if (!id) {
+      throw new BadRequestException('올바르지 않은 데이터를 요청하였습니다.');
+    }
+
+    const user = await this.usersRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException('서버로 부터 유저 정보를 찾을 수 없습니다.');
+    }
+
+    await this.usersRepository.delete({ id: user.id });
+
+    return {
+      result: true,
+      message: '유저가 삭제되었습니다.',
+    };
   }
 }
