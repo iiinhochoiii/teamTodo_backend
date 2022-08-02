@@ -2,6 +2,7 @@ import {
   Injectable,
   HttpException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,6 +11,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { User } from '../users/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { ResultType } from '../interfaces/common';
 
 @Injectable()
 export class AuthService {
@@ -106,6 +108,26 @@ export class AuthService {
     return {
       result: true,
       message: '회원가입이 완료 되었습니다.',
+    };
+  }
+
+  async checkEmail(email: string): Promise<ResultType> {
+    if (!email) {
+      throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다');
+    }
+
+    const user = await this.usersRepository.findOneBy({ email });
+
+    if (user) {
+      return {
+        result: false,
+        message: '이미 사용중인 이메일 입니다.',
+      };
+    }
+
+    return {
+      result: true,
+      message: '사용 가능한 이메일 입니다.',
     };
   }
 }
