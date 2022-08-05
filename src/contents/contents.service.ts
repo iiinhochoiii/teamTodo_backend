@@ -68,6 +68,9 @@ export class ContentsService {
       where: {
         creatorUserId: id,
       },
+      order: {
+        createdAt: 'DESC',
+      },
     });
   }
 
