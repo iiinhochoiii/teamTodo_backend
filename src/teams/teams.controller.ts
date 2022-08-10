@@ -1,4 +1,13 @@
-import { Controller, UseGuards, Post, Body, Req } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Post,
+  Body,
+  Req,
+  Get,
+  Delete,
+  Param,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { TeamsService } from './teams.service';
@@ -13,5 +22,18 @@ export class TeamsController {
   create(@Req() req: Request, @Body() body: CreateTeamDto) {
     const { user }: any = req;
     return this.service.create(user.id, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  find(@Req() req: Request) {
+    const { user }: any = req;
+    return this.service.find(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':name')
+  deleteTeam(@Param() params) {
+    return this.service.deleteTeam(params.name);
   }
 }
