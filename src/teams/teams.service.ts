@@ -111,4 +111,24 @@ export class TeamsService {
       message: '팀이 삭제되었습니다.',
     };
   }
+
+  async checkTeamName(name: string): Promise<ResultType> {
+    if (!name) {
+      throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다');
+    }
+
+    const team = await this.teamsRepository.findOneBy({ name });
+
+    if (team) {
+      return {
+        result: false,
+        message: '이미 사용중인 팀 이름 입니다.',
+      };
+    }
+
+    return {
+      result: true,
+      message: '사용 가능한 팀 이름 입니다.',
+    };
+  }
 }

@@ -36,4 +36,10 @@ export class TeamsController {
   deleteTeam(@Param() params) {
     return this.service.deleteTeam(params.name);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/checkTeam/:name')
+  checkTeamName(@Param() params) {
+    return this.service.checkTeamName(params.name);
+  }
 }
