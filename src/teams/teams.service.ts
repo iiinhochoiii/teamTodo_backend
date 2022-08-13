@@ -80,12 +80,12 @@ export class TeamsService {
     };
   }
 
-  async deleteTeam(name: string): Promise<ResultType> {
-    if (!name) {
+  async deleteTeam(id: number): Promise<ResultType | any> {
+    if (!id) {
       throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
     }
 
-    const team = await this.teamsRepository.findOneBy({ name });
+    const team = await this.teamsRepository.findOneBy({ id });
 
     if (!team) {
       throw new NotFoundException('서버로 부터 팀 정보를 찾을 수 없습니다.');
@@ -97,14 +97,15 @@ export class TeamsService {
       },
     });
 
-    if (teamMember.length > 0) {
+    if (teamMember.filter((member) => member.role !== 'owner').length > 0) {
       return {
         result: false,
         message: '팀에 소속된 멤버들이 존재 합니다.',
       };
     }
 
-    await this.teamsRepository.delete({ name });
+    await this.teamMemberRepository.delete({ id: teamMember[0].id });
+    await this.teamsRepository.delete({ id: team.id });
 
     return {
       result: true,

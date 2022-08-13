@@ -32,9 +32,9 @@ export class TeamsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':name')
+  @Delete(':id')
   deleteTeam(@Param() params) {
-    return this.service.deleteTeam(params.name);
+    return this.service.deleteTeam(params.id);
   }
 
   @UseGuards(JwtAuthGuard)
