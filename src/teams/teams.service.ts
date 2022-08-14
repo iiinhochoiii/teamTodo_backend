@@ -132,4 +132,17 @@ export class TeamsService {
       message: '사용 가능한 팀 이름 입니다.',
     };
   }
+
+  async findAll() {
+    return this.teamsRepository
+      .createQueryBuilder('team')
+      .innerJoinAndMapMany(
+        'team.members',
+        TeamMember,
+        'teamMember',
+        'team.id = teamMember.team_id',
+      )
+      .where('teamMember.user_id = :user_id', { user_id: 4 })
+      .getMany();
+  }
 }

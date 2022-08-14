@@ -42,4 +42,10 @@ export class TeamsController {
   checkTeamName(@Param() params) {
     return this.service.checkTeamName(params.name);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/findAll')
+  findAll() {
+    return this.service.findAll();
+  }
 }

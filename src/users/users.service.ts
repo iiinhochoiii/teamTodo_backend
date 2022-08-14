@@ -9,6 +9,8 @@ import { User } from './user.entity';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { ResultType } from '../interfaces/common';
 import * as bcrypt from 'bcrypt';
+import { TeamMember } from '../teamMembers/teamMember.entity';
+import { Team } from '../teams/team.entity';
 
 @Injectable()
 export class UsersService {
@@ -16,21 +18,36 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async findMy(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({
-      select: [
-        'id',
-        'email',
-        'email',
-        'name',
-        'phone',
-        'profile',
-        'createdAt',
-        'updatedAt',
-        'lastLoginedAt',
-      ],
-      where: [{ id }],
-    });
+  async findMy(id: number): Promise<User | any> {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .innerJoinAndMapMany(
+        'user.teamMember',
+        TeamMember,
+        'teamMember',
+        'teamMember.user_id = user.id',
+      )
+      .innerJoinAndMapMany(
+        'user.teams',
+        Team,
+        'team',
+        'team.id = teamMember.team_id',
+      )
+      .select([
+        'user.id',
+        'user.email',
+        'user.email',
+        'user.name',
+        'user.phone',
+        'user.profile',
+        'user.createdAt',
+        'user.updatedAt',
+        'user.lastLoginedAt',
+        'team',
+        'teamMember',
+      ])
+      .where('user.id = :id', { id })
+      .getOne();
 
     if (!user) {
       throw new NotFoundException('서버로 부터 유저 정보를 찾을 수 없습니다.');
