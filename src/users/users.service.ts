@@ -27,8 +27,8 @@ export class UsersService {
         'teamMember',
         'teamMember.user_id = user.id',
       )
-      .innerJoinAndMapMany(
-        'user.teams',
+      .innerJoinAndMapOne(
+        'teamMember.team_info',
         Team,
         'team',
         'team.id = teamMember.team_id',
@@ -36,15 +36,19 @@ export class UsersService {
       .select([
         'user.id',
         'user.email',
-        'user.email',
         'user.name',
         'user.phone',
         'user.profile',
         'user.createdAt',
         'user.updatedAt',
         'user.lastLoginedAt',
-        'team',
         'teamMember',
+        'team.id',
+        'team.name',
+        'team.description',
+        'team.maskcot',
+        'team.createdAt',
+        'team.updatedAt',
       ])
       .where('user.id = :id', { id })
       .getOne();
