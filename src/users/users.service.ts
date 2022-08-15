@@ -21,13 +21,13 @@ export class UsersService {
   async findMy(id: number): Promise<User | any> {
     const user = await this.usersRepository
       .createQueryBuilder('user')
-      .innerJoinAndMapMany(
+      .leftJoinAndMapMany(
         'user.teamMember',
         TeamMember,
         'teamMember',
         'teamMember.user_id = user.id',
       )
-      .innerJoinAndMapOne(
+      .leftJoinAndMapOne(
         'teamMember.team_info',
         Team,
         'team',
@@ -43,12 +43,7 @@ export class UsersService {
         'user.updatedAt',
         'user.lastLoginedAt',
         'teamMember',
-        'team.id',
-        'team.name',
-        'team.description',
-        'team.maskcot',
-        'team.createdAt',
-        'team.updatedAt',
+        'team',
       ])
       .where('user.id = :id', { id })
       .getOne();
