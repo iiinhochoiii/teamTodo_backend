@@ -28,7 +28,7 @@ export class UsersService {
         'teamMember.user_id = user.id',
       )
       .leftJoinAndMapOne(
-        'teamMember.team_info',
+        'teamMember.team',
         Team,
         'team',
         'team.id = teamMember.team_id',

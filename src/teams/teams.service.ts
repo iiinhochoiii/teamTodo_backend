@@ -104,12 +104,17 @@ export class TeamsService {
       };
     }
 
-    await this.teamMemberRepository.delete({ id: teamMember[0].id });
+    await this.teamMemberRepository.delete({
+      id: teamMember[0].id,
+    });
     await this.teamsRepository.delete({ id: team.id });
 
     return {
       result: true,
       message: '팀이 삭제되었습니다.',
+      data: {
+        team_id: id,
+      },
     };
   }
 
