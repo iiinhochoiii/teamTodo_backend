@@ -7,11 +7,13 @@ import {
   Get,
   Delete,
   Param,
+  Put,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/createTeam.dto';
+import { UpdateTeamDto } from './dto/updateTeam.dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -22,6 +24,13 @@ export class TeamsController {
   create(@Req() req: Request, @Body() body: CreateTeamDto) {
     const { user }: any = req;
     return this.service.create(user.id, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put()
+  update(@Req() req: Request, @Body() body: UpdateTeamDto) {
+    const { user }: any = req;
+    return this.service.update(user.id, body);
   }
 
   @UseGuards(JwtAuthGuard)

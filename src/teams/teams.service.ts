@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +10,7 @@ import { Team } from './team.entity';
 import { Repository } from 'typeorm';
 import { ResultType } from '../interfaces/common';
 import { CreateTeamDto } from './dto/createTeam.dto';
+import { UpdateTeamDto } from './dto/updateTeam.dto';
 import { User } from '../users/user.entity';
 import { TeamMember } from '../teamMembers/teamMember.entity';
 
@@ -62,6 +64,51 @@ export class TeamsService {
       data: {
         ...result,
         teamMember: teamMember,
+      },
+    };
+  }
+
+  async update(
+    user_id: number,
+    body: UpdateTeamDto,
+  ): Promise<ResultType | any> {
+    const { id, name, maskcot, description } = body;
+    if (!id) {
+      throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
+    }
+
+    const team = await this.teamsRepository.findOneBy({ id });
+
+    if (!team) {
+      throw new NotFoundException(
+        '서버로 부터 변경할 정보를 찾을 수 없습니다.',
+      );
+    }
+
+    if (user_id !== team.creatorUserId) {
+      throw new UnauthorizedException('팀 정보를 변경할 수 없는 권한입니다.');
+    }
+
+    if (name) {
+      const checkTeam = await this.teamsRepository.findOneBy({ name });
+
+      if (checkTeam) {
+        throw new BadRequestException('이미 등록된 팀 이름 입니다.');
+      }
+    }
+
+    const result = await this.teamsRepository.update(id, {
+      name,
+      maskcot,
+      description,
+      updatedAt: new Date(),
+    });
+
+    return {
+      result: true,
+      message: '팀 정보가 변경되었습니다.',
+      data: {
+        ...result,
       },
     };
   }
