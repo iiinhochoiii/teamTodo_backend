@@ -127,6 +127,47 @@ export class TeamsService {
     };
   }
 
+  async findByTeamName(id: number, name: string): Promise<ResultType> {
+    if (!id || !name) {
+      throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
+    }
+
+    const team = await this.teamsRepository
+      .createQueryBuilder('team')
+      .leftJoinAndMapMany(
+        'team.members',
+        TeamMember,
+        'members',
+        'members.team_id = team.id',
+      )
+      .leftJoinAndMapOne(
+        'members.user',
+        User,
+        'user',
+        'user.id = members.user_id',
+      )
+      .where('team.name = :name', { name })
+      .select([
+        'team',
+        'members',
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.lastLoginedAt',
+        'user.phone',
+        'user.profile',
+      ])
+      .getOne();
+
+    if (!team) {
+      throw new NotFoundException('서버로 부터 팀 정보를 찾을 수 없습니다.');
+    }
+
+    return {
+      data: team,
+    };
+  }
+
   async deleteTeam(id: number): Promise<ResultType | any> {
     if (!id) {
       throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');

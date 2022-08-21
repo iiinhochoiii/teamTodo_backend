@@ -41,6 +41,13 @@ export class TeamsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get(':name')
+  findByTeamName(@Req() req: Request, @Param() params) {
+    const { user }: any = req;
+    return this.service.findByTeamName(user.id, params.name);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   deleteTeam(@Param() params) {
     return this.service.deleteTeam(params.id);
