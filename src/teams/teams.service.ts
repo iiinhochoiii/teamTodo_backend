@@ -114,16 +114,39 @@ export class TeamsService {
   }
 
   async find(id: number): Promise<ResultType> {
-    const res = await this.teamMemberRepository.find({
-      where: {
-        user_id: id,
-      },
-      relations: ['team'],
-    });
+    const team = await this.teamsRepository
+      .createQueryBuilder('team')
+      .leftJoinAndMapMany(
+        'team.members',
+        TeamMember,
+        'members',
+        'members.team_id = team.id',
+      )
+      .leftJoinAndMapOne(
+        'members.user',
+        User,
+        'user',
+        'user.id = members.user_id',
+      )
+      .where('user.id = :id', { id })
+      .select([
+        'team',
+        'members',
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.lastLoginedAt',
+        'user.phone',
+        'user.profile',
+      ])
+      .getMany();
+
+    if (!team) {
+      throw new NotFoundException('서버로 부터 팀 정보를 찾을 수 없습니다.');
+    }
 
     return {
-      result: true,
-      data: res,
+      data: team,
     };
   }
 

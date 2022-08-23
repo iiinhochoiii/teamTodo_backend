@@ -22,16 +22,16 @@ export class UsersService {
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndMapMany(
-        'user.teamMember',
+        'team.members',
         TeamMember,
-        'teamMember',
-        'teamMember.user_id = user.id',
+        'members',
+        'members.user_id = user.id',
       )
-      .leftJoinAndMapOne(
-        'teamMember.team',
+      .leftJoinAndMapMany(
+        'user.team',
         Team,
         'team',
-        'team.id = teamMember.team_id',
+        'team.id = members.team_id',
       )
       .select([
         'user.id',
@@ -42,7 +42,7 @@ export class UsersService {
         'user.createdAt',
         'user.updatedAt',
         'user.lastLoginedAt',
-        'teamMember',
+        'members',
         'team',
       ])
       .where('user.id = :id', { id })
