@@ -97,7 +97,7 @@ export class TeamsService {
       }
     }
 
-    const result = await this.teamsRepository.update(id, {
+    await this.teamsRepository.update(id, {
       name,
       maskcot,
       description,
@@ -108,7 +108,8 @@ export class TeamsService {
       result: true,
       message: '팀 정보가 변경되었습니다.',
       data: {
-        ...result,
+        ...team,
+        ...body,
       },
     };
   }
