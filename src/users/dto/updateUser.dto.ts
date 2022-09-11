@@ -9,4 +9,7 @@ export class UpdateUserDto {
 
   @IsString()
   readonly phone: string;
+
+  @IsString()
+  readonly profile: string;
 }

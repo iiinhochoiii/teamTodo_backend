@@ -88,7 +88,7 @@ export class UsersService {
   async updateUser(id: number, body: UpdateUserDto): Promise<ResultType> {
     const user = await this.usersRepository.findOneBy({ id });
 
-    if (!body.name && !body.password && !body.phone) {
+    if (!body.name && !body.password && !body.phone && !body.profile) {
       throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
     }
 
@@ -108,6 +108,7 @@ export class UsersService {
       password: hashedPassword,
       name: body.name,
       phone: body.phone,
+      profile: body.profile,
       updatedAt: new Date(),
     });
 
