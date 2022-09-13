@@ -67,9 +67,9 @@ export class AuthService {
     result: boolean;
     message: string;
   }> {
-    const { email, name, password, phone } = data;
+    const { email, name, password, phone, position } = data;
 
-    if (!email || !name || !password || !phone) {
+    if (!email || !name || !password || !phone || !position) {
       throw new HttpException(
         {
           status: 500,
@@ -102,6 +102,7 @@ export class AuthService {
       name,
       password: hashedPassword,
       phone,
+      position,
       createdAt: new Date(),
     });
 

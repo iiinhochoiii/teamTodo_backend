@@ -39,6 +39,7 @@ export class UsersService {
         'user.name',
         'user.phone',
         'user.profile',
+        'user.position',
         'user.createdAt',
         'user.updatedAt',
         'user.lastLoginedAt',
@@ -71,6 +72,7 @@ export class UsersService {
         'name',
         'phone',
         'profile',
+        'position',
         'createdAt',
         'updatedAt',
         'lastLoginedAt',
@@ -88,7 +90,10 @@ export class UsersService {
   async updateUser(id: number, body: UpdateUserDto): Promise<ResultType> {
     const user = await this.usersRepository.findOneBy({ id });
 
-    if (!body.name && !body.password && !body.phone && !body.profile) {
+    if (
+      (!body.name && !body.password && !body.phone && !body.profile) ||
+      !body.position
+    ) {
       throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
     }
 
@@ -109,6 +114,7 @@ export class UsersService {
       name: body.name,
       phone: body.phone,
       profile: body.profile,
+      position: body.position,
       updatedAt: new Date(),
     });
 

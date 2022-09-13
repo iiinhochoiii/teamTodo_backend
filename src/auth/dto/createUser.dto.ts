@@ -12,4 +12,7 @@ export class CreateUserDto {
 
   @IsString()
   readonly phone: string;
+
+  @IsString()
+  readonly position: string;
 }

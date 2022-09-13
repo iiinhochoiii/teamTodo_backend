@@ -139,6 +139,7 @@ export class TeamsService {
         'user.lastLoginedAt',
         'user.phone',
         'user.profile',
+        'user.position',
       ])
       .getMany();
 
@@ -180,6 +181,7 @@ export class TeamsService {
         'user.lastLoginedAt',
         'user.phone',
         'user.profile',
+        'user.position',
       ])
       .getOne();
 

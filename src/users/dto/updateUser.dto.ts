@@ -12,4 +12,7 @@ export class UpdateUserDto {
 
   @IsString()
   readonly profile: string;
+
+  @IsString()
+  readonly position: string;
 }

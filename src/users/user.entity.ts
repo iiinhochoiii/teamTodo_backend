@@ -20,6 +20,9 @@ export class User {
   @Column({ nullable: true })
   profile: string | null;
 
+  @Column({ nullable: true })
+  position: string | null;
+
   @Column({
     nullable: true,
   })
