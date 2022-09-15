@@ -91,7 +91,10 @@ export class UsersService {
     const user = await this.usersRepository.findOneBy({ id });
 
     if (
-      (!body.name && !body.password && !body.phone && !body.profile) ||
+      !body.name &&
+      !body.password &&
+      !body.phone &&
+      !body.profile &&
       !body.position
     ) {
       throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
