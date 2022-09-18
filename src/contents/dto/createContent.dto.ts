@@ -9,4 +9,7 @@ export class CreateContentDto {
 
   @IsArray()
   readonly happend: string[];
+
+  @IsNumber()
+  readonly teamId?: number;
 }

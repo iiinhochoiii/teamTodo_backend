@@ -16,6 +16,11 @@ export class Content {
   })
   updatedAt: Date | null;
 
+  @Column({
+    nullable: true,
+  })
+  teamId: number | null;
+
   @Column('simple-array')
   plan: string[];
 

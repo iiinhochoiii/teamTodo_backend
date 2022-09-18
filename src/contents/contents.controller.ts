@@ -23,8 +23,13 @@ export class ContentsController {
   @Get()
   find(@Req() req: Request) {
     const { user }: any = req;
-
     return this.service.findAll(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':teamId')
+  findByTeam(@Param() param) {
+    return this.service.findByTeam(param.teamId);
   }
 
   @UseGuards(JwtAuthGuard)

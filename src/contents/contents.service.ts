@@ -17,7 +17,7 @@ export class ContentsService {
   ) {}
 
   async create(content: CreateContentDto): Promise<ResultType> {
-    const { creatorUserId, happend, plan } = content;
+    const { creatorUserId, happend, plan, teamId } = content;
 
     if (!content.creatorUserId) {
       throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
@@ -28,6 +28,7 @@ export class ContentsService {
       happend,
       plan,
       createdAt: new Date(),
+      teamId,
     });
 
     return {
@@ -67,6 +68,17 @@ export class ContentsService {
     return this.repository.find({
       where: {
         creatorUserId: id,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+
+  async findByTeam(teamId: number) {
+    return this.repository.find({
+      where: {
+        teamId,
       },
       order: {
         createdAt: 'DESC',
