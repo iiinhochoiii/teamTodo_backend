@@ -9,6 +9,7 @@ import { CreateContentDto } from './dto/createContent.dto';
 import { UpdateContentDto } from './dto/updateContent.dto';
 import { Content } from './content.entity';
 import { ResultType } from '../interfaces/common';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class ContentsService {
@@ -64,29 +65,67 @@ export class ContentsService {
     };
   }
 
-  async findAll(id: number) {
-    return this.repository.find({
-      where: {
-        creatorUserId: id,
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+  async findAll(id: number): Promise<ResultType> {
+    const contents = await this.repository
+      .createQueryBuilder('content')
+      .leftJoinAndMapOne(
+        'content.user',
+        User,
+        'user',
+        'content.creatorUserId = user.id',
+      )
+      .select([
+        'content',
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.lastLoginedAt',
+        'user.phone',
+        'user.profile',
+        'user.position',
+      ])
+      .where('content.creatorUserId = :id AND content.teamId IS NULL', {
+        id: id,
+      })
+      .orderBy('content.id', 'DESC')
+      .getMany();
+
+    return {
+      data: contents,
+    };
   }
 
-  async findByTeam(teamId: number) {
-    return this.repository.find({
-      where: {
+  async findByTeam(teamId: number): Promise<ResultType> {
+    const contents = await this.repository
+      .createQueryBuilder('content')
+      .leftJoinAndMapOne(
+        'content.user',
+        User,
+        'user',
+        'content.creatorUserId = user.id',
+      )
+      .select([
+        'content',
+        'user.id',
+        'user.name',
+        'user.email',
+        'user.lastLoginedAt',
+        'user.phone',
+        'user.profile',
+        'user.position',
+      ])
+      .where('content.teamId = :teamId', {
         teamId,
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+      })
+      .orderBy('content.id', 'DESC')
+      .getMany();
+
+    return {
+      data: contents,
+    };
   }
 
-  async delete(id: number): Promise<ResultType | any> {
+  async delete(id: number): Promise<ResultType> {
     if (!id) {
       throw new BadRequestException('id가 전달되지 않았습니다.');
     }
