@@ -4,9 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateContentDto } from './dto/createContent.dto';
 import { UpdateContentDto } from './dto/updateContent.dto';
+import { FindContentDto } from './dto/findContent.dto';
+
 import { Content } from './content.entity';
 import { ResultType } from '../interfaces/common';
 import { User } from '../users/user.entity';
@@ -65,7 +67,16 @@ export class ContentsService {
     };
   }
 
-  async findAll(id: number): Promise<ResultType> {
+  async findAll(id: number, pageOption: FindContentDto): Promise<ResultType> {
+    const { page = 1, pageSize = 10 } = pageOption;
+
+    const offset = (page - 1) * pageSize;
+
+    const total = await this.repository.countBy({
+      creatorUserId: id,
+      teamId: IsNull(),
+    });
+
     const contents = await this.repository
       .createQueryBuilder('content')
       .leftJoinAndMapOne(
@@ -88,14 +99,33 @@ export class ContentsService {
         id: id,
       })
       .orderBy('content.id', 'DESC')
+      .offset(offset)
+      .limit(pageSize)
       .getMany();
 
     return {
       data: contents,
+      page: {
+        offset: Number(offset),
+        limit: Number(pageSize),
+        total: total,
+        hasNext: Number(offset) + Number(pageSize) < total,
+      },
     };
   }
 
-  async findByTeam(teamId: number): Promise<ResultType> {
+  async findByTeam(
+    teamId: number,
+    pageOption: FindContentDto,
+  ): Promise<ResultType> {
+    const { page = 1, pageSize = 10 } = pageOption;
+
+    const offset = (page - 1) * pageSize;
+
+    const total = await this.repository.countBy({
+      teamId: teamId,
+    });
+
     const contents = await this.repository
       .createQueryBuilder('content')
       .leftJoinAndMapOne(
@@ -122,6 +152,12 @@ export class ContentsService {
 
     return {
       data: contents,
+      page: {
+        offset: Number(offset),
+        limit: Number(pageSize),
+        total: total,
+        hasNext: Number(offset) + Number(pageSize) < total,
+      },
     };
   }
 
