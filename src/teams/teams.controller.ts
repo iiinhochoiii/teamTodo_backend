@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/createTeam.dto';
 import { UpdateTeamDto } from './dto/updateTeam.dto';
+import { InviteTeamDto } from './dto/inviteTeam.dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -63,5 +64,11 @@ export class TeamsController {
   @Get('/findAll')
   findAll() {
     return this.service.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/invite')
+  invite(@Body() body: InviteTeamDto) {
+    return this.service.invite(body);
   }
 }

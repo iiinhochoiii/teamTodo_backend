@@ -23,8 +23,4 @@ export class TeamMember {
 
   @Column()
   isActive: boolean;
-
-  @OneToOne(() => Team)
-  @JoinColumn({ name: 'team_id' })
-  team: Team;
 }

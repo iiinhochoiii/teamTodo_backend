@@ -7,10 +7,11 @@ import {
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Team } from './team.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ResultType } from '../interfaces/common';
 import { CreateTeamDto } from './dto/createTeam.dto';
 import { UpdateTeamDto } from './dto/updateTeam.dto';
+import { InviteTeamDto } from './dto/inviteTeam.dto';
 import { User } from '../users/user.entity';
 import { TeamMember } from '../teamMembers/teamMember.entity';
 
@@ -263,5 +264,69 @@ export class TeamsService {
       )
       .where('teamMember.user_id = :user_id', { user_id: 4 })
       .getMany();
+  }
+
+  async invite(body: InviteTeamDto): Promise<ResultType> {
+    const { teamId, emails } = body;
+
+    const team = await this.teamsRepository.findOne({
+      where: {
+        id: teamId,
+      },
+    });
+
+    if (!team) {
+      throw new NotFoundException('서버로 부터 팀 정보를 찾을 수 없습니다.');
+    }
+
+    const userList = await this.usersRepository.find({
+      where: {
+        email: In(emails),
+      },
+    });
+
+    const userIds = userList.map((user) => user.id);
+
+    if (userList.length === 0) {
+      throw new NotFoundException('서버로 부터 유저 정보를 찾을 수 없습니다.');
+    }
+
+    const isTeam = await this.teamMemberRepository.find({
+      where: {
+        user_id: In(userIds),
+        team_id: teamId,
+      },
+    });
+
+    if (isTeam.length > 0) {
+      throw new BadRequestException(
+        '이미 팀에 소속되어있는 유저가 존재합니다.',
+      );
+    }
+
+    const values = {
+      team_id: teamId,
+      role: 'member',
+      isActive: true,
+    };
+
+    await this.teamMemberRepository
+      .createQueryBuilder()
+      .insert()
+      .into(TeamMember)
+      .values(
+        userIds.map((id) => {
+          return {
+            user_id: id,
+            ...values,
+          };
+        }),
+      )
+      .execute();
+
+    return {
+      result: true,
+      message: '해당 팀에 유저를 초대하였습니다.',
+    };
   }
 }
