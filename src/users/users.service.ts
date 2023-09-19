@@ -9,8 +9,6 @@ import { User } from './user.entity';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { ResultType } from '../interfaces/common';
 import * as bcrypt from 'bcrypt';
-import { TeamMember } from '../teamMembers/teamMember.entity';
-import { Team } from '../teams/team.entity';
 
 @Injectable()
 export class UsersService {
@@ -19,35 +17,20 @@ export class UsersService {
   ) {}
 
   async findMy(id: number): Promise<User | any> {
-    const user = await this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoinAndMapMany(
-        'team.members',
-        TeamMember,
-        'members',
-        'members.user_id = user.id',
-      )
-      .leftJoinAndMapMany(
-        'user.team',
-        Team,
-        'team',
-        'team.id = members.team_id',
-      )
-      .select([
-        'user.id',
-        'user.email',
-        'user.name',
-        'user.phone',
-        'user.profile',
-        'user.position',
-        'user.createdAt',
-        'user.updatedAt',
-        'user.lastLoginedAt',
-        'members',
-        'team',
-      ])
-      .where('user.id = :id', { id })
-      .getOne();
+    const user = await this.usersRepository.findOne({
+      select: [
+        'id',
+        'email',
+        'name',
+        'phone',
+        'profile',
+        'position',
+        'createdAt',
+        'updatedAt',
+        'lastLoginedAt',
+      ],
+      where: [{ id }],
+    });
 
     if (!user) {
       throw new NotFoundException('서버로 부터 유저 정보를 찾을 수 없습니다.');

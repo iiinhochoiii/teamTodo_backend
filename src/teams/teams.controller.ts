@@ -15,6 +15,7 @@ import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/createTeam.dto';
 import { UpdateTeamDto } from './dto/updateTeam.dto';
 import { InviteTeamDto } from './dto/inviteTeam.dto';
+import { DistoryMember } from './dto/distroyMemeber.dto';
 
 @Controller('teams')
 export class TeamsController {
@@ -70,5 +71,12 @@ export class TeamsController {
   @Post('/invite')
   invite(@Body() body: InviteTeamDto) {
     return this.service.invite(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/distroy')
+  distroyMember(@Req() req: Request, @Body() body: DistoryMember) {
+    const { user }: any = req;
+    return this.service.distroy(user.id, body);
   }
 }

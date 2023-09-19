@@ -12,6 +12,8 @@ import { ResultType } from '../interfaces/common';
 import { CreateTeamDto } from './dto/createTeam.dto';
 import { UpdateTeamDto } from './dto/updateTeam.dto';
 import { InviteTeamDto } from './dto/inviteTeam.dto';
+import { DistoryMember } from './dto/distroyMemeber.dto';
+
 import { User } from '../users/user.entity';
 import { TeamMember } from '../teamMembers/teamMember.entity';
 
@@ -130,7 +132,6 @@ export class TeamsService {
         'user',
         'user.id = members.user_id',
       )
-      .where('user.id = :id', { id })
       .select([
         'team',
         'members',
@@ -144,12 +145,16 @@ export class TeamsService {
       ])
       .getMany();
 
-    if (!team) {
+    const myTeams = team.filter((item: any) =>
+      item.members.find((member) => member.user_id === id),
+    );
+
+    if (!myTeams) {
       throw new NotFoundException('서버로 부터 팀 정보를 찾을 수 없습니다.');
     }
 
     return {
-      data: team,
+      data: myTeams,
     };
   }
 
@@ -327,6 +332,44 @@ export class TeamsService {
     return {
       result: true,
       message: '해당 팀에 유저를 초대하였습니다.',
+    };
+  }
+
+  async distroy(id: number, body: DistoryMember): Promise<ResultType> {
+    const { teamId, userId } = body;
+    if (!teamId || !userId) {
+      throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
+    }
+
+    const team = await this.teamsRepository.findOneBy({
+      id: teamId,
+    });
+
+    if (id !== team.creatorUserId) {
+      throw new UnauthorizedException('팀 정보를 변경할 수 없는 권한입니다.');
+    }
+
+    const member = await this.teamMemberRepository.findOneBy({
+      user_id: userId,
+      team_id: teamId,
+    });
+
+    if (!member) {
+      throw new NotFoundException(
+        '서버로 부터 변경할 정보를 찾을 수 없습니다.',
+      );
+    }
+
+    await this.teamMemberRepository.delete({
+      id: member.id,
+    });
+
+    return {
+      result: true,
+      message: '멤버를 내보내기 하였습니다.',
+      data: {
+        member_id: member.id,
+      },
     };
   }
 }
