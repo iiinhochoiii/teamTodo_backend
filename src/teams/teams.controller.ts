@@ -79,4 +79,13 @@ export class TeamsController {
     const { user }: any = req;
     return this.service.distroy(user.id, body);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/unsubscribe/:teamId')
+  unSubscribe(@Req() req: Request, @Param() params) {
+    const { user }: any = req;
+    const { teamId } = params;
+
+    return this.service.unSubscribe(user.id, teamId);
+  }
 }

@@ -372,4 +372,40 @@ export class TeamsService {
       },
     };
   }
+
+  async unSubscribe(userId: number, teamId: number): Promise<ResultType> {
+    if (!teamId) {
+      throw new BadRequestException('올바르지 않은 데이터를 전송하였습니다.');
+    }
+
+    const team = await this.teamsRepository.findOneBy({
+      id: teamId,
+    });
+
+    if (!team) {
+      throw new NotFoundException('서버로 부터 팀 정보를 찾을 수 없습니다.');
+    }
+
+    const member = await this.teamMemberRepository.findOneBy({
+      user_id: userId,
+      team_id: teamId,
+    });
+
+    if (!member) {
+      throw new NotFoundException('서버로 부터 멤버 정보를 찾을 수 없습니다.');
+    }
+
+    if (team.creatorUserId === userId || member.role === 'owner') {
+      throw new BadRequestException('팀 생성자는 팀 나가기가 되지 않습니다.');
+    }
+
+    await this.teamMemberRepository.delete({
+      id: member.id,
+    });
+
+    return {
+      result: true,
+      message: '팀에서 나가기가 완료되었습니다.',
+    };
+  }
 }
