@@ -12,14 +12,16 @@ import { FindContentDto } from './dto/findContent.dto';
 import { Content } from './content.entity';
 import { ResultType } from '../interfaces/common';
 import { User } from '../users/user.entity';
+import { Team } from '../teams/team.entity';
 
 @Injectable()
 export class ContentsService {
   constructor(
     @InjectRepository(Content) private repository: Repository<Content>,
+    @InjectRepository(Team) private teamsRepository: Repository<Team>,
   ) {}
 
-  async create(content: CreateContentDto): Promise<ResultType> {
+  async create(content: CreateContentDto): Promise<any> {
     const { creatorUserId, happend, plan, teamId } = content;
 
     if (!content.creatorUserId) {
@@ -34,9 +36,16 @@ export class ContentsService {
       teamId,
     });
 
+    const team = teamId
+      ? await this.teamsRepository.findOneBy({ id: teamId })
+      : undefined;
+
     return {
       result: true,
       message: '컨텐츠가 등록 되었습니다.',
+      ...(team && {
+        teamName: team.name,
+      }),
     };
   }
 
