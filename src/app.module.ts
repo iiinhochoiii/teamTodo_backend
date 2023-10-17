@@ -10,11 +10,14 @@ import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
+        type: 'postgres',
         host: configService.get<string>('DATABASE_HOST'),
         port: parseInt(configService.get<string>('DATABASE_PORT')),
         username: configService.get<string>('DATABASE_USER'),
