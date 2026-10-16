@@ -157,6 +157,8 @@ export class ContentsService {
         teamId,
       })
       .orderBy('content.id', 'DESC')
+      .offset(offset)
+      .limit(pageSize)
       .getMany();
 
     return {
